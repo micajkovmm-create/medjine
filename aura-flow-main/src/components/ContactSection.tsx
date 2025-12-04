@@ -10,35 +10,34 @@ const ContactSection = () => {
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const response = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-
-    if (response.ok) {
-      toast({
-        title: "Message Sent",
-        description: "Thank you for reaching out. We'll get back to you soon.",
+    try {
+      const response = await fetch("https://medjine.com/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
-      setFormData({ name: "", email: "", message: "" });
-    } else {
+
+      if (response.ok) {
+        toast({
+          title: "Message Sent",
+          description: "Thank you for reaching out. We'll get back to you soon.",
+        });
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        toast({
+          title: "Error",
+          description: "Something went wrong. Please try again later.",
+        });
+      }
+    } catch (error) {
       toast({
         title: "Error",
-        description: "Something went wrong. Please try again later.",
+        description: "Network problem. Please try again later.",
       });
     }
-  } catch (error) {
-    toast({
-      title: "Error",
-      description: "Network problem. Please try again later.",
-    });
-  }
-};
-
+  };
 
   return (
     <section
@@ -85,8 +84,7 @@ const ContactSection = () => {
                   medjinebooking@gmail.com
                 </a>
               </div>
-
-              {/* Management Removed */}
+              {/* Management removed */}
             </div>
 
             {/* Social Links */}
@@ -137,7 +135,7 @@ const ContactSection = () => {
                     viewBox="0 0 24 24"
                     fill="currentColor"
                   >
-                    <path d="M17.5 10.5c-.2 0-.4 0-.6.1-.3-2.3-2.3-4.1-4.7-4.1-1 0-1.9.3-2.7.8-.3.2-.4.5-.4.9v7.1c0 .6.4 1 1 1h7.4c2 0 3.5-1.5 3.5-3.4s-1.5-3.4-3.5-3.4zM5 9c-.6 0-1 .4-1 1v6c0 .6.4 1 1 1s1-.4 1-1V10c0-.6-.4-1-1-1zm3 1c-.6 0-1 .4-1 1v5c0 .6.4 1 1 1s1-.4 1-1v-5c0-.6-.4-1-1-1zm2-1c-.6 0-1 .4-1 1v6c0 .6.4 1 1 1s1-.4 1-1V10c0-.6-.4-1-1-1z"/>
+                    <path d="M17.5 10.5c-.2 0-.4 0-.6.1-.3-2.3-2.3-4.1-4.7-4.1-1 0-1.9.3-2.7.8-.3.2-.4.5-.4.9v7.1c0 .6.4 1 1 1h7.4c2 0 3.5-1.5 3.5-3.4s-1.5-3.4-3.5-3.4zM5 9c-.6 0-1 .4-1 1v6c0 .6.4 1 1 1s1-.4 1-1V10c0-.6-.4-1-1-1zm3 1c-.6 0-1 .4-1 1v5c0 .6.4 1 1 1s1-.4 1-1v-5c0-.6-.4-1-1-1zm2-1c-.6 0-1 .4-1 1v6c0 .6.4 1 1 1s1-.4 1-1V10c0-.6-.4-1-1-1z" />
                   </svg>
                 </a>
 
@@ -154,7 +152,7 @@ const ContactSection = () => {
             </div>
           </div>
 
-          {/* Contact Form (unchanged) */}
+          {/* Contact Form */}
           <div>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
