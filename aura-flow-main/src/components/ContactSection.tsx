@@ -1,59 +1,21 @@
-import { useState } from "react";
+import React, { useEffect } from "react";
 import { Instagram, Youtube, Mail, Send } from "lucide-react";
+import { useForm, ValidationError } from "@formspree/react";
 import { toast } from "@/hooks/use-toast";
 
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/mdkqdwwy"; // <- CHANGE THIS
-
 const ContactSection = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
+  // Formspree form hook – your real form ID
+  const [state, handleSubmit] = useForm("mdkqdwwy");
 
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-
-    try {
-      const response = await fetch(FORMSPREE_ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          message: formData.message,
-        }),
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Message sent",
-          description: "Thank you for reaching out. I’ll get back to you soon.",
-        });
-        setFormData({ name: "", email: "", message: "" });
-      } else {
-        toast({
-          title: "Error",
-          description: "Something went wrong. Please try again later.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
+  // Show toast when Formspree succeeds
+  useEffect(() => {
+    if (state.succeeded) {
       toast({
-        title: "Network error",
-        description: "Check your connection and try again.",
-        variant: "destructive",
+        title: "Message sent",
+        description: "Thank you for reaching out. I’ll get back to you soon.",
       });
-    } finally {
-      setSubmitting(false);
     }
-  };
+  }, [state.succeeded]);
 
   return (
     <section
@@ -178,13 +140,9 @@ const ContactSection = () => {
                   Name
                 </label>
                 <input
-                  type="text"
                   id="name"
+                  type="text"
                   name="name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
                   required
                   className="w-full bg-transparent border-b border-border/50 py-3 font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors duration-300"
                   placeholder="Your name"
@@ -199,16 +157,17 @@ const ContactSection = () => {
                   Email
                 </label>
                 <input
-                  type="email"
                   id="email"
+                  type="email"
                   name="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
                   required
                   className="w-full bg-transparent border-b border-border/50 py-3 font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors duration-300"
                   placeholder="your@email.com"
+                />
+                <ValidationError
+                  prefix="Email"
+                  field="email"
+                  errors={state.errors}
                 />
               </div>
 
@@ -222,23 +181,24 @@ const ContactSection = () => {
                 <textarea
                   id="message"
                   name="message"
-                  value={formData.message}
-                  onChange={(e) =>
-                    setFormData({ ...formData, message: e.target.value })
-                  }
                   required
                   rows={4}
                   className="w-full bg-transparent border-b border-border/50 py-3 font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors duration-300 resize-none"
                   placeholder="Tell us about your event or inquiry..."
                 />
+                <ValidationError
+                  prefix="Message"
+                  field="message"
+                  errors={state.errors}
+                />
               </div>
 
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={state.submitting}
                 className="btn-primary w-full glow-effect flex items-center justify-center gap-3 mt-8 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {submitting ? "Sending..." : "Send Message"}
+                {state.submitting ? "Sending..." : "Send Message"}
                 <Send size={18} />
               </button>
             </form>
