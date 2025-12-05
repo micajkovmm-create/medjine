@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Instagram, Youtube, Mail, Send } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/mdkqdwwy"; // <- CHANGE THIS
+
 const ContactSection = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -9,37 +11,47 @@ const ContactSection = () => {
     message: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
 
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+        }),
       });
 
-      const data = await response.json().catch(() => null);
-      console.log("Contact response:", response.status, data);
-
-      if (response.ok && data?.ok) {
+      if (response.ok) {
         toast({
-          title: "Message Sent",
-          description: "Thank you for reaching out. We'll get back to you soon.",
+          title: "Message sent",
+          description: "Thank you for reaching out. I’ll get back to you soon.",
         });
         setFormData({ name: "", email: "", message: "" });
       } else {
         toast({
           title: "Error",
           description: "Something went wrong. Please try again later.",
+          variant: "destructive",
         });
       }
     } catch (error) {
-      console.error("Contact form error:", error);
       toast({
-        title: "Error",
-        description: "Network problem. Please try again later.",
+        title: "Network error",
+        description: "Check your connection and try again.",
+        variant: "destructive",
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -48,10 +60,12 @@ const ContactSection = () => {
       id="contact"
       className="section-padding bg-gradient-to-b from-background to-card relative overflow-hidden"
     >
+      {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       <div className="absolute top-1/2 -right-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl" />
 
       <div className="max-w-5xl mx-auto relative z-10">
+        {/* Header */}
         <div className="text-center mb-16">
           <p className="font-body text-sm tracking-[0.3em] text-primary mb-4 uppercase">
             Get In Touch
@@ -62,7 +76,7 @@ const ContactSection = () => {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-16">
-          {/* LEFT: info */}
+          {/* Contact Info */}
           <div>
             <h3 className="font-display text-2xl font-semibold text-foreground mb-6">
               Let&apos;s Create Something Extraordinary
@@ -72,26 +86,29 @@ const ContactSection = () => {
               through the form or connect directly with the team.
             </p>
 
+            {/* Contact Details */}
             <div className="space-y-6 mb-10">
               <div>
                 <p className="font-body text-sm text-muted-foreground uppercase tracking-wider mb-2">
                   Booking
                 </p>
                 <a
-                  href="mailto:contact@medjine.com"
+                  href="mailto:medjinebooking@gmail.com"
                   className="font-display text-lg text-foreground hover:text-primary transition-colors duration-300 flex items-center gap-2"
                 >
                   <Mail size={18} />
-                  contact@medjine.com
+                  medjinebooking@gmail.com
                 </a>
               </div>
             </div>
 
+            {/* Social Links */}
             <div>
               <p className="font-body text-sm text-muted-foreground uppercase tracking-wider mb-4">
                 Follow
               </p>
               <div className="flex gap-4">
+                {/* Instagram */}
                 <a
                   href="https://www.instagram.com/iammedjine/"
                   target="_blank"
@@ -100,6 +117,44 @@ const ContactSection = () => {
                 >
                   <Instagram size={20} />
                 </a>
+
+                {/* TikTok */}
+                <a
+                  href="https://www.tiktok.com/@iammedjine?lang=en"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 flex items-center justify-center border border-border/50 text-foreground/60 hover:border-primary hover:text-primary transition-all duration-300"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12.5 2c.4 2.1 1.9 3.8 4 4v3.1c-1.5 0-2.9-.5-4-1.4v6.8c0 3-2.5 5.4-5.5 5.4S1.5 17.5 1.5 14.5 4 9 7 9c.7 0 1.4.1 2 .4v3.3c-.6-.4-1.3-.6-2-.6-1.7 0-3 1.3-3 2.9s1.3 2.9 3 2.9c1.7 0 3-1.3 3-2.9V2h2.5z" />
+                  </svg>
+                </a>
+
+                {/* SoundCloud */}
+                <a
+                  href="https://soundcloud.com/djmedjine"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 flex items-center justify-center border border-border/50 text-foreground/60 hover:border-primary hover:text-primary transition-all duration-300"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M17.5 10.5c-.2 0-.4 0-.6.1-.3-2.3-2.3-4.1-4.7-4.1-1 0-1.9.3-2.7.8-.3.2-.4.5-.4.9v7.1c0 .6.4 1 1 1h7.4c2 0 3.5-1.5 3.5-3.4s-1.5-3.4-3.5-3.4zM5 9c-.6 0-1 .4-1 1v6c0 .6.4 1 1 1s1-.4 1-1V10c0-.6-.4-1-1-1zm3 1c-.6 0-1 .4-1 1v5c0 .6.4 1 1 1s1-.4 1-1v-5c0-.6-.4-1-1-1zm2-1c-.6 0-1 .4-1 1v6c0 .6.4 1 1 1s1-.4 1-1V10c0-.6-.4-1-1-1z" />
+                  </svg>
+                </a>
+
+                {/* YouTube */}
                 <a
                   href="https://www.youtube.com/@iammedjine"
                   target="_blank"
@@ -112,7 +167,7 @@ const ContactSection = () => {
             </div>
           </div>
 
-          {/* RIGHT: form */}
+          {/* Contact Form */}
           <div>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
@@ -123,8 +178,9 @@ const ContactSection = () => {
                   Name
                 </label>
                 <input
-                  id="name"
                   type="text"
+                  id="name"
+                  name="name"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -143,8 +199,9 @@ const ContactSection = () => {
                   Email
                 </label>
                 <input
-                  id="email"
                   type="email"
+                  id="email"
+                  name="email"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
@@ -164,6 +221,7 @@ const ContactSection = () => {
                 </label>
                 <textarea
                   id="message"
+                  name="message"
                   value={formData.message}
                   onChange={(e) =>
                     setFormData({ ...formData, message: e.target.value })
@@ -177,9 +235,10 @@ const ContactSection = () => {
 
               <button
                 type="submit"
-                className="btn-primary w-full glow-effect flex items-center justify-center gap-3 mt-8"
+                disabled={submitting}
+                className="btn-primary w-full glow-effect flex items-center justify-center gap-3 mt-8 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Send Message
+                {submitting ? "Sending..." : "Send Message"}
                 <Send size={18} />
               </button>
             </form>
